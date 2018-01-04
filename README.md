@@ -14,7 +14,5 @@ Please refer our [paper](https://arxiv.org/abs/1711.06445) for more details.
 # Code
 Clone this repository into any place you want.
 	
-	git clone "https://github.com/kligvasser/xUnit"
+	git clone https://github.com/kligvasser/xUnit
 	cd xUnit
-
-
