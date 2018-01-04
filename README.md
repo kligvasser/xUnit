@@ -24,7 +24,4 @@ Clone this repository into any place you want.
 ### Gaussian Denoising
 
 The average PSNR in [dB] attained by several state of the art denoising algorithms on the BSD68:
-|Methods|BM3D|WNNM|EPLL|MLP|DnCNN-S|xDnCNN|
-
-
-
+| Methods | BM3D | WNNM | EPLL | MLP | DnCNN-S | xDnCNN |
