@@ -15,7 +15,7 @@ Please refer our [paper](https://arxiv.org/abs/1711.06445) for more details.
 
 # Code
 Clone this repository into any place you want.
-	
+
 	git clone https://github.com/kligvasser/xUnit
 	cd xUnit
 
@@ -26,14 +26,11 @@ Clone this repository into any place you want.
 The average PSNR in [dB] attained by several state of the art denoising algorithms on the BSD68:
 
 | Methods | BM3D | WNNM | EPLL | MLP | DnCNN-S | xDnCNN |
-|   ---   | ---  | ---  | ---  | --- |   ---   |  ---   |
+| --- | --- | --- | --- | --- | --- | --- |
 | # Parameters | - | - | - | - | 555K | 303K |
-|   ---   | ---  | ---  | ---  | --- |   ---   |  ---   |
-| σ=25 | 28.56 | 28.82 | 28.68 | 28.95 | 29.22 | 29.21 |
-|   ---   | ---  | ---  | ---  | --- |   ---   |  ---   |
-| σ=50 | 25.62 | 25.87 | 25.67 | 26.01 | 26.23 | 26.26 |
+|      σ=25    | 28.56 | 28.82 | 28.68 | 28.95 | 29.22 | 29.21 |
+|      σ=50    | 25.62 | 25.87 | 25.67 | 26.01 | 26.23 | 26.26 |
 
 ### Single image super resolution
 
 TBD
-
