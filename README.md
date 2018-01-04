@@ -13,9 +13,8 @@ Please refer our [paper](https://arxiv.org/abs/1711.06445) for more details.
 
 # Code
 Clone this repository into any place you want.
-```bash
-git clone https://github.com/thstkdgus35/EDSR-PyTorch
-cd EDSR-PyTorch
-```
+	
+	git clone "https://github.com/kligvasser/xUnit"
+	cd xUnit
 
 
