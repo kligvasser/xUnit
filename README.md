@@ -16,3 +16,10 @@ Clone this repository into any place you want.
 	
 	git clone https://github.com/kligvasser/xUnit
 	cd xUnit
+
+# Results
+###
+
+Gaussian Denoising
+
+The average PSNR(dB) results of different methods on the BSD68 dataset.
