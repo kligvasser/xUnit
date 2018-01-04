@@ -21,7 +21,7 @@ Clone this repository into any place you want.
 
 
 ## Results
-# Gaussian Denoising
+### Gaussian Denoising
 
 The average PSNR(dB) results of different methods on the BSD68 dataset:
 
