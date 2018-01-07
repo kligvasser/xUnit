@@ -64,6 +64,15 @@ def count_model_weights(model):
             continue
     return tot
 
+def prepare_data(input,target,use_cuda=True,volatile=True):
+    if (use_cuda):
+        input = Variable(input.cuda(),volatile=volatile)
+        target = Variable(target.cuda())
+    else:
+        input = Variable(input,volatile=volatile)
+        target = Variable(target)
+    return input,target
+
 def tensor_to_img(t):
     if (len(t.shape)==4):
         t = t[0,:,:,:]

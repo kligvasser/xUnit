@@ -32,6 +32,14 @@ The average PSNR in [dB] attained by several state of the art denoising algorith
 |      σ=25    | 28.56 | 28.82 | 28.68 | 28.95 | **29.22** | 29.21 |
 |      σ=50    | 25.62 | 25.87 | 25.67 | 26.01 | 26.23 | **26.26** |
 
-### Single image super resolution
 
-TBD
+### Single Image Super Resolution
+
+The average PSNR in [dB] attained in the task of 3× and 4× SR on datasets Set5, Set14 and BSD100:
+
+| Dataset | Scale | SRCNN (57K) | xSRCNN-c (44K)| xSRCNN-f (**32K**)|
+| :---: | :---: | :---: | :---: | :---: |
+| Set14 | 3× | 29.29 | 29.45 | **29.47** |
+|       | 4× | 27.49 | 27.72 | **27.76** |
+| BSD100 | 3× | 28.41 | **28.54** | 28.53 |
+|        | 4× | 26.90 | 27.04 | **27.06** |
