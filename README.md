@@ -11,7 +11,6 @@ Please refer our [paper](https://arxiv.org/abs/1711.06445) for more details.
 # Dependencies
 - python (tested with 3.5)
 - PyTorch >= 0.2.0
-- [PyINN](https://github.com/szagoruyko/pyinn)
 
 
 # Code

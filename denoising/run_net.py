@@ -5,7 +5,6 @@ import functions
 import models
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-from torch.autograd import Variable
 import numpy as np
 import argparse
 

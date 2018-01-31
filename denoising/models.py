@@ -1,10 +1,6 @@
 ### imports ###
-import sys
-sys.path.append("/usr/local/lib/python3.5/dist-packages/pyinn")
-
 import torch.nn as nn
 import torch
-from pyinn.modules import Conv2dDepthwise
 
 ### models ###
 class distances(nn.Module):
@@ -23,7 +19,7 @@ class modulecell(nn.Module):
         self.module = nn.Sequential(
             nn.BatchNorm2d(out_channels),
             nn.ReLU(),
-            Conv2dDepthwise(out_channels,kernel_size=skernel_size,stride=1,padding=((skernel_size-1)//2)),
+            nn.Conv2d(out_channels,out_channels,kernel_size=skernel_size,stride=1,padding=((skernel_size-1)//2),groups=out_channels),
             nn.BatchNorm2d(out_channels),
             distances())
         self.multi = nn.Sequential(

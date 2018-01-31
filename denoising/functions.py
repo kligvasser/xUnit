@@ -1,15 +1,11 @@
 
 ### imports ###
-import numpy as np
 import glob
 import matplotlib.pyplot as plt
 import torch
-import matplotlib.image as mpimg
-import smtplib
 from PIL import Image
 from torch.utils.data.dataset import Dataset
-from random import randint
-import os
+from torch.autograd import Variable
 
 ### defines ###
 
@@ -21,7 +17,6 @@ class data_set(Dataset):
         self.transform = transform
         self.imgs_name = glob.glob(imgs_lib+"*.*")
         self.n_imgs = len(self.imgs_name)
-
     def __getitem__(self,index):
         img2read = self.imgs_name[index]
         img = Image.open(img2read)
