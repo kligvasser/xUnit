@@ -27,7 +27,6 @@ class data_set(Dataset):
         noise_std = self.noise_std
         img = img+noise_std*torch.randn(img.size()).type(torch.FloatTensor)
         return img,label
-
     def __len__(self):
         return len(self.imgs_name)
 
