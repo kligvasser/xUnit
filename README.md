@@ -36,15 +36,8 @@ The average PSNR in [dB] attained by several state of the art denoising algorith
 
 The average PSNR in [dB] attained in the task of 3× and 4× SR on BSD100 dataset:
 
-| Methods | SRCNN | xSRCNN-c | xSRCNN-f |
-| :---: | :---: | :---: | :---: |
-| # Parameters | 57K | 44K | **32K** |
-| 3× | 28.41 | **28.54** | 28.53 |
-| 4× | 26.90 | 27.04 | **27.06** |
-
-The average PSNR in [dB] attained in the task of 4× SR on BSD100 dataset:
-
-| Methods | SRResNet | xSRResNet |
-| :---: | :---: | :---: |
-| # Parameters | 1.546M | **1.155M** |
-| 4× | 27.58 | **27.61** |
+| Methods | SRCNN | xSRCNNc | xSRCNNf | SRResNet | xSRResNet |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| # Parameters | 57K | 44K | **32K** | 1.546M | 1.155M |
+| 3× | 28.41 | **28.54** | 28.53 | - | - |
+| 4× | 26.90 | 27.04 | 27.06 | 27.58 | **27.61** |
