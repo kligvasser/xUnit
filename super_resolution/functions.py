@@ -8,16 +8,20 @@ from torch.autograd import Variable
 from PIL import Image
 from torch.utils.data.dataset import Dataset
 import random
+import torchvision.transforms as transforms
 
 ### defines ###
 
 ### classes ###
 class data_set(Dataset):
-    def __init__(self,data_dir="",scale=4,transform=None):
+    def __init__(self,data_dir="",scale=4,pixels_shuffle=False,transform=None):
         self.data_dir = data_dir
         self.scale = scale
-        self.imgs_list = glob.glob(data_dir+('gt_im/*x%s.*'%scale))
         self.transform = transform
+        if (pixels_shuffle):
+            self.imgs_list = glob.glob(data_dir+('gt_ps_im/*x%s.*'%scale))
+        else:
+            self.imgs_list = glob.glob(data_dir+('gt_im/*x%s.*'%scale))
         self.num_imgs = len(self.imgs_list)
     def __getitem__(self,idx):
         seed = np.random.randint(2147483647) # make a seed with numpy generator
@@ -32,23 +36,20 @@ class data_set(Dataset):
         return img_in,img_tar
     def __len__(self):
         return len(self.imgs_list)
-
     def get_file_name(self,idx):
         name_tar = self.imgs_list[idx]
         name_in = name_tar.replace('gt','lr')
         return name_in,name_tar
 
 ### functions ###
-def plot_images(images,use_cuda=False,num_cols=3):
+def plot_images(images,use_cuda=False):
     imgs2plot = tensor_to_cpu(images,use_cuda)
-    num_imgs = imgs2plot.size()[0]-1
-    num_rows = 1+num_imgs//num_cols
-    fig,axes = plt.subplots(num_rows,num_cols)
+    fig,axes = plt.subplots(1,3)
     fig.subplots_adjust(hspace=0.6,wspace=0.1)
-    labels = ['Original','LR','xSRCNN']
+    labels = ['Original','LR','Reconstructed']
     for i,ax in enumerate(axes.flat):
         img = tensor_to_img(imgs2plot[i,:,:,:])
-        ax.imshow(img[:,:,0],cmap='gray')
+        ax.imshow(img,cmap='gray')
         label2plot = (labels[i])
         ax.set_xlabel(label2plot)
         ax.set_xticks([])
@@ -66,10 +67,9 @@ def count_model_weights(model):
             continue
     return tot
 
-def tensor_to_img(t):
-    if (len(t.shape)==4):
-        t = t[0,:,:,:]
-    img = t.numpy().transpose((1,2,0))
+def tensor_to_img(tensor):
+    unloader = transforms.Compose([transforms.ToPILImage()])
+    img = unloader(tensor)
     return img
 
 def tensor_to_cpu(tensor,is_cuda):
@@ -84,17 +84,27 @@ def tensor_to_gpu(tensor,is_cuda):
     else:
         return tensor
 
-def prepare_data(input,target,use_cuda=True,volatile=True):
+def prepare_data(input,target,pixels_shuffle=False,use_cuda=True,volatile=True):
     if (use_cuda):
         input = Variable(input.cuda(),volatile=volatile)
         target = Variable(target.cuda())
     else:
         input = Variable(input,volatile=volatile)
         target = Variable(target)
+    if (pixels_shuffle):
+        return input,target
+    else:
+        input = rgb_to_ycbcr(input)
+        target = rgb_to_ycbcr(target)
+        return input,target
 
-    input = rgb_to_ycbcr(input)
-    target = rgb_to_ycbcr(target)
-    return input,target
+def resize_lr(image,size,use_cuda):
+    loader = transforms.Compose([transforms.ToPILImage(),transforms.Resize(size,interpolation=Image.NEAREST),transforms.ToTensor()])
+    image = image.squeeze(0)
+    image = loader(tensor_to_cpu(image.data,use_cuda))
+    image = image.unsqueeze(0)
+    image = torch.autograd.Variable(tensor_to_gpu(image,use_cuda))
+    return image
 
 def rgb_to_ycbcr(input):
     output = Variable(input.data.new(*input.size()))

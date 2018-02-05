@@ -24,7 +24,6 @@ class modulecell(nn.Module):
             distances())
         self.multi = nn.Sequential(
             multipication())
-
     def forward(self,x):
         x1 = self.features(x)
         x2 = self.module(x1)
@@ -58,7 +57,6 @@ class xDnCNN(nn.Module):
             nn.BatchNorm2d(channels),
             modulecell(in_channels=channels,out_channels=channels,kernel_size=3))
         self.joints = nn.Conv2d(channels,1,kernel_size=3,padding=1)
-
     def forward(self,x):
         x = self.md1(x)
         x = self.md2(x)
