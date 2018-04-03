@@ -48,7 +48,7 @@ def get_arguments():
     parser.add_argument('--images',help='path to dataset',default='./data/bsd100/')
     parser.add_argument('--plot',help='plot images',default=False,action='store_true')
     parser.add_argument('--scale',type=int,help='super-resolution scale 3/4',default=4)
-    parser.add_argument('--model',type=str,help='super-resoltuion model xsrcnnf/xsrcnnc/xsrresnet',default='xsrcnnf')
+    parser.add_argument('--model',type=str,help='super-resoltuion model xsrcnnf/xsrcnnc/xsrresnet',default='xsrresnet')
     opt = parser.parse_args()
     if (opt.model=='xsrresnet'):
         opt.scale = 4
