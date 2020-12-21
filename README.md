@@ -2,7 +2,7 @@
 Learning a Spatial Activation Function for Efficient Image Restoration.
 
 <p align="center">
-  <img width="1004" height="414" src="/figures/figure1.png">
+  <img width="1004" height="414" src="/figures/activations.png">
 </p>
 
 Please refer our [paper](https://arxiv.org/abs/1711.06445) for more details.
