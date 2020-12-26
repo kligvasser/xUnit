@@ -3,9 +3,9 @@ function bicubic_subsample()
 
 %% set parameters
 % comment the unnecessary line
-input_folder = '/home/klig/Dropbox/python/projects/internal-external/images/GOPR0854_11_00/deblurgan-v2';
-save_mod_folder = '/home/klig/Dropbox/python/projects/internal-external/images/GOPR0854_11_00/deblurgan-v2_mod';
-save_LR_folder = '/home/klig/Dropbox/python/projects/internal-external/images/GOPR0854_11_00/deblurgan-v2_x3';
+input_folder = '';
+save_mod_folder = '';
+save_LR_folder = '';
 % save_bic_folder = '';
 
 up_scale = 3;

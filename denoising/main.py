@@ -23,7 +23,7 @@ def get_arguments():
     parser.add_argument('--gen-to-load', default='', help='resume training from file (default: None)')
     parser.add_argument('--root', default='', help='root dataset folder')
     parser.add_argument('--noise-sigma', default=50, type=int, help='noise-sigma (default: 50)')
-    parser.add_argument('--crop-size', default=50, type=int, help='low resolution cropping size (default: 50)')
+    parser.add_argument('--crop-size', default=64, type=int, help='low resolution cropping size (default: 64)')
     parser.add_argument('--gray-scale', default=False, action='store_true', help='gray-scale images (default: false)')
     parser.add_argument('--blind', default=False, action='store_true', help='blind-denoising images (default: false)')
     parser.add_argument('--max-size', default=None, type=int, help='validation set max-size (default: None)')

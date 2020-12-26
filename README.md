@@ -50,7 +50,7 @@ python -m pip install -r requirements.txt
 This code requires PyTorch 1.0+ and python 3+.
 
 ### Super-resoltution
-Pretrained models are avaible at: [LINK](https://www.dropbox.com/s/l6fmgn1r600dmyq/sr_pretrained.zip?dl=0).
+Pretrained models are avaible at: [LINK](https://www.dropbox.com/s/wvc0qsuoekfuhfz/sr_pretrained.zip?dl=0).
 
 #### Dataset preparation
 For the super-resolution task, the dataset should contains a low and high resolution pairs, in folder structure of:
@@ -95,7 +95,7 @@ python3 main.py --root <path-to-dataset> --g-model g_xsrgan --d-model d_xsrgan -
 ```
 
 ### Gaussian denoising
-Pretrained models are avaible at: [LINK]().
+Pretrained models are avaible at: [LINK](https://www.dropbox.com/s/zychmfzx52y8tvq/denoising_pretrained.zip?dl=0).
 
 #### Dataset preparation
 For the denoising task, the dataset should contains only clean images, in folder structure of:
@@ -112,9 +112,14 @@ val
 python3 main.py --root <path-to-dataset> --g-model g_xdncnn --d-model d_xdncnn --model-config "{'gen_blocks':10, 'dis_blocks':4, 'in_channels':1}" --reconstruction-weight 1.0 --perceptual-weight 0 --adversarial-weight 0 --crop-size 50 --gray-scale --noise-sigma 50 --epochs 500 --step-size 150
 ```
 
-#### Train xDNCNN Grayscale 50 sigma WGAN-GP model
+#### Train xDNCNN 75 sigma PSNR model
 ```
-python3 main.py --root <path-to-dataset> --g-model g_xdncnn --d-model d_xdncnn --model-config "{'gen_blocks':10, 'dis_blocks':4, 'in_channels':1}" --reconstruction-weight 1.0 --perceptual-weight 1.0 --adversarial-weight 0.01 --crop-size 64 --gray-scale --noise-sigma 50 --epochs 1000 --step-size 300 --gen-to-load <path-to-psnr-pretrained-pt> --wgan --penalty-weight 10
+python3 main.py --root <path-to-dataset> --g-model g_xdncnn --d-model d_xdncnn --model-config "{'gen_blocks':10, 'dis_blocks':4, 'in_channels':3}" --reconstruction-weight 1.0 --perceptual-weight 0 --adversarial-weight 0 --crop-size 64 --noise-sigma 75 --epochs 1000 --step-size 300
+```
+
+#### Train xDNCNN 75 sigma WGAN-GP model
+```
+python3 main.py --root <path-to-dataset> --g-model g_xdncnn --d-model d_xdncnn --model-config "{'gen_blocks':10, 'dis_blocks':4, 'in_channels':3}" --reconstruction-weight 1.0 --perceptual-weight 1.0 --adversarial-weight 0.01 --crop-size 72 --noise-sigma 75 --epochs 1000 --step-size 300 --gen-to-load <path-to-psnr-pretrained-pt> --wgan --penalty-weight 10
 ```
 
 #### Train xDNCNN Grayscale blind PSNR model
