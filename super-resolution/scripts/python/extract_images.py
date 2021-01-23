@@ -23,28 +23,24 @@ def mkdir(save_path):
 def mkdirs(args):
     mkdir(os.path.join(args.root,'img_sub'))
     mkdir(os.path.join(args.root,'img_sub_x{}'.format(args.scale)))
-    mkdir(os.path.join(args.root,'label_sub_x{}'.format(args.scale)))
 
 def get_image_paths(args):
     paths = glob.glob(os.path.join(args.root, 'img_x{}'.format(args.scale), '*.*'))
     return paths
 
-def save_images(args, i, path, input, target, label):
+def save_images(args, i, path, input, target):
     save_path = path.replace('img_x', 'img_sub_x').replace('.png', '_{}.png'.format(i))
     input.save(save_path)
     save_path = path.replace('img_x{}'.format(args.scale), 'img_sub').replace('.png', '_{}.png'.format(i))
     target.save(save_path)
-    save_path = path.replace('img_x', 'label_sub_x').replace('.png', '_{}.png'.format(i))
-    label.save(save_path)
 
 def load_images(path, args):
     input = Image.open(path)
     target = Image.open(path.replace('img_x{}'.format(args.scale), 'img'))
-    label = Image.open(path.replace('img_x', 'label_x'))
-    return input, target, label
+    return input, target
 
 def worker(path, args):
-    input, target, label = load_images(path, args)
+    input, target = load_images(path, args)
 
     h, w = input.size
     hs = np.arange(0, h - args.crop_size + 1, args.step_size)
@@ -62,9 +58,8 @@ def worker(path, args):
     for x in hs:
         for y in ws:
             cropped_input = input.crop((x, y, (x + args.crop_size), (y + args.crop_size)))
-            cropped_label = label.crop((x, y, (x + args.crop_size), (y + args.crop_size)))
             cropped_target = target.crop((x * args.scale, y * args.scale, (x + args.crop_size) * args.scale, (y + args.crop_size) * args.scale))
-            save_images(args, counts, path, cropped_input, cropped_target, cropped_label)
+            save_images(args, counts, path, cropped_input, cropped_target)
             counts += 1
 
     print('Processed {:s}'.format(os.path.basename(path)))
