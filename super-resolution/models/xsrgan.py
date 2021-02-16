@@ -5,7 +5,7 @@ from torch.nn.utils.spectral_norm import spectral_norm as SpectralNorm
 from .modules.activations import xUnitS
 from .modules.misc import UpsampleX2, center_crop
 
-__all__ = ['g_xsrgan', 'd_xsrgan']
+__all__ = ['g_xsrgan', 'd_xsrgan', 'd_xsrgan_ad']
 
 def initialize_weights(net, scale=1.):
     if not isinstance(net, list):
@@ -127,6 +127,39 @@ class Discriminator(nn.Module):
         x = self.classifier(x)
         return x
 
+class DiscriminatorAdaptive(nn.Module):
+    def __init__(self, in_channels, num_features, gen_blocks, dis_blocks, scale):
+        super(DiscriminatorAdaptive, self).__init__()
+        self.crop_size = 4 * pow(2, dis_blocks)
+
+        # image to features
+        self.image_to_features = DisBlock(in_channels=in_channels, out_channels=num_features, bias=True, normalization=False)
+
+        # features
+        blocks = []
+        for i in range(0, dis_blocks - 1):
+            blocks.append(DisBlock(in_channels=num_features * min(pow(2, i), 8), out_channels=num_features * min(pow(2, i + 1), 8), bias=False, normalization=False))
+        self.features = nn.Sequential(*blocks)
+
+        # pooling
+        self.avg_pool = nn.AdaptiveAvgPool2d(output_size=1)
+
+        # classifier
+        self.classifier = nn.Sequential(
+            nn.Linear(num_features * min(pow(2, dis_blocks - 1), 8), num_features),
+            nn.LeakyReLU(negative_slope=0.1),
+            nn.Linear(num_features, 1)
+        )
+
+    def forward(self, x):
+        x = center_crop(x, self.crop_size, self.crop_size)
+        x = self.image_to_features(x)
+        x = self.features(x)
+        x = self.avg_pool(x)
+        x = x.flatten(start_dim=1)
+        x = self.classifier(x)
+        return x
+
 class SNDiscriminator(nn.Module):
     def __init__(self, in_channels, num_features, gen_blocks, dis_blocks, scale):
         super(SNDiscriminator, self).__init__()
@@ -141,6 +174,9 @@ class SNDiscriminator(nn.Module):
             blocks.append(DisBlock(in_channels=num_features * min(pow(2, i), 8), out_channels=num_features * min(pow(2, i + 1), 8), bias=False, normalization=True))
         self.features = nn.Sequential(*blocks)
 
+        # pooling
+        self.avg_pool = nn.AdaptiveAvgPool2d(output_size=1)
+
         # classifier
         self.classifier = nn.Sequential(
             SpectralNorm(nn.Linear(num_features * min(pow(2, dis_blocks - 1), 8) * 4 * 4, 100)),
@@ -152,6 +188,36 @@ class SNDiscriminator(nn.Module):
         x = center_crop(x, self.crop_size, self.crop_size)
         x = self.image_to_features(x)
         x = self.features(x)
+        x = x.flatten(start_dim=1)
+        x = self.classifier(x)
+        return x
+
+class SNDiscriminatorAdaptive(nn.Module):
+    def __init__(self, in_channels, num_features, gen_blocks, dis_blocks, scale):
+        super(SNDiscriminatorAdaptive, self).__init__()
+        self.crop_size = 4 * pow(2, dis_blocks)
+
+        # image to features
+        self.image_to_features = DisBlock(in_channels=in_channels, out_channels=num_features, bias=True, normalization=True)
+
+        # features
+        blocks = []
+        for i in range(0, dis_blocks - 1):
+            blocks.append(DisBlock(in_channels=num_features * min(pow(2, i), 8), out_channels=num_features * min(pow(2, i + 1), 8), bias=False, normalization=True))
+        self.features = nn.Sequential(*blocks)
+
+        # classifier
+        self.classifier = nn.Sequential(
+            SpectralNorm(nn.Linear(num_features * min(pow(2, dis_blocks - 1), 8), num_features)),
+            nn.LeakyReLU(negative_slope=0.1),
+            SpectralNorm(nn.Linear(num_features, 1))
+        )
+
+    def forward(self, x):
+        x = center_crop(x, self.crop_size, self.crop_size)
+        x = self.image_to_features(x)
+        x = self.features(x)
+        x = self.avg_pool(x)
         x = x.flatten(start_dim=1)
         x = self.classifier(x)
         return x
@@ -180,3 +246,17 @@ def d_xsrgan(**config):
         return SNDiscriminator(**config)
     else:
         return Discriminator(**config)
+
+def d_xsrgan_ad(**config):
+    config.setdefault('in_channels', 3)
+    config.setdefault('num_features', 64)
+    config.setdefault('gen_blocks', 10)
+    config.setdefault('dis_blocks', 5)
+    config.setdefault('scale', 4)
+
+    sn = config.pop('spectral', False)
+
+    if sn:
+        return SNDiscriminatorAdaptive(**config)
+    else:
+        return DiscriminatorAdaptive(**config)
