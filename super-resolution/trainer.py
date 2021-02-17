@@ -266,7 +266,7 @@ class Trainer():
 
         # critic iteration
         if self.args.adversarial_weight > 0.:
-            if self.args.wgan:
+            if self.args.wgan or self.args.relativistic:
                 self._critic_wgan_iteration(inputs, targets)
             else:
                 self._critic_hinge_iteration(inputs, targets)
