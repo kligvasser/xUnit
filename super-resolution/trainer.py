@@ -35,8 +35,20 @@ class Trainer():
 
         g_model = models.__dict__[self.args.g_model]
         d_model = models.__dict__[self.args.d_model]
-        self.g_model = g_model(**model_config).to(self.device)
-        self.d_model = d_model(**model_config).to(self.device)
+        self.g_model = g_model(**model_config)
+        self.d_model = d_model(**model_config)
+
+        # loading weights
+        if self.args.gen_to_load != '':
+            logging.info('\nLoading g-model...')
+            self.g_model.load_state_dict(torch.load(self.args.gen_to_load, map_location='cpu'))
+        if self.args.dis_to_load != '':
+            logging.info('\nLoading d-model...')
+            self.d_model.load_state_dict(torch.load(self.args.dis_to_load, map_location='cpu'))
+
+        # to cuda
+        self.g_model = self.g_model.to(self.args.device)
+        self.d_model = self.d_model.to(self.args.device)
 
         # parallel
         if self.args.device_ids and len(self.args.device_ids) > 1:
@@ -50,14 +62,6 @@ class Trainer():
             logging.info(self.d_model)
             logging.info('Number of parameters in discriminator: {}\n'.format(sum([l.nelement() for l in self.d_model.parameters()])))
             self.print_model = False
-
-        # loading weights
-        if self.args.gen_to_load != '':
-            logging.info('\nLoading g-model...')
-            self.g_model.load_state_dict(torch.load(self.args.gen_to_load))
-        if self.args.dis_to_load != '':
-            logging.info('\nLoading d-model...')
-            self.d_model.load_state_dict(torch.load(self.args.dis_to_load))
 
     def _init_optim(self):
         # initialize optimizer

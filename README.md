@@ -81,8 +81,9 @@ python3 main.py --root <path-to-dataset> --g-model g_xsrgan --d-model d_xsrgan -
 
 #### Train xSRGAN x4 WGAN-GP model
 ```
-python3 main.py --root <path-to-dataset> --g-model g_xsrgan --d-model d_xsrgan_ad --model-config "{'scale':4, 'gen_blocks':10, 'dis_blocks':5}" --scale 4 --reconstruction-weight 1.0 --perceptual-weight 1.0 --adversarial-weight 0.02 --crop-size 64 --epochs 2500 --step-size 1000 --gen-to-load <path-to-psnr-pretrained-pt> --wgan --penalty-weight 10
+python3 main.py --root <path-to-dataset> --g-model g_xsrgan --d-model d_xsrgan_ad --model-config "{'scale':4, 'gen_blocks':10, 'dis_blocks':5}" --scale 4 --reconstruction-weight 1.0 --perceptual-weight 1.0 --adversarial-weight 0.005 --crop-size 64 --epochs 1200 --step-size 900 --gen-to-load <path-to-psnr-pretrained-pt> --wgan --penalty-weight 10
 ```
+
 
 #### Train xSRGAN x4 with SN-discriminator model
 ```
