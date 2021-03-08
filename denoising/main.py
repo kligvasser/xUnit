@@ -8,7 +8,6 @@ from trainer import Trainer
 from datetime import datetime
 from os import path
 from utils import misc
-from random import randint
 
 # torch.autograd.set_detect_anomaly(True)
 
@@ -43,7 +42,7 @@ def get_arguments():
     parser.add_argument('--reconstruction-weight', default=1.0, type=float, help='reconstruction-weight (default: 1.0)')
     parser.add_argument('--perceptual-weight', default=0, type=float, help='perceptual-weight (default: 0)')
     parser.add_argument('--adversarial-weight', default=0.01, type=float, help='adversarial-weight (default: 0.01)')
-    parser.add_argument('--textural-weight', default=0, type=float, help='textural-weight (default: 0)')
+    parser.add_argument('--style-weight', default=0, type=float, help='style-weight (default: 0)')
     parser.add_argument('--print-every', default=20, type=int, help='print-every (default: 20)')
     parser.add_argument('--eval-every', default=50, type=int, help='eval-every (default: 50)')
     parser.add_argument('--results-dir', metavar='RESULTS_DIR', default='./results', help='results dir')
@@ -87,5 +86,5 @@ def main():
 
 if __name__ == '__main__':
     # enables a ctrl-c without triggering errors
-    # signal.signal(signal.SIGINT, lambda x, y: sys.exit(0))
+    signal.signal(signal.SIGINT, lambda x, y: sys.exit(0))
     main()

@@ -21,7 +21,7 @@ class PerceptualLoss(nn.Module):
     def __init__(self, features_to_compute, criterion=torch.nn.L1Loss(), shave_edge=None):
         super(PerceptualLoss, self).__init__()
         self.criterion = criterion
-        self.features_extractor = MultiVGGFeaturesExtractor(target_features=features_to_compute, requires_grad=False, shave_edge=shave_edge).eval()
+        self.features_extractor = MultiVGGFeaturesExtractor(target_features=features_to_compute, shave_edge=shave_edge).eval()
 
     def forward(self, inputs, targets):
         inputs_fea = self.features_extractor(inputs)
@@ -34,11 +34,11 @@ class PerceptualLoss(nn.Module):
 
         return loss
 
-class TexturalLoss(nn.Module):
+class StyleLoss(nn.Module):
     def __init__(self, features_to_compute, criterion=torch.nn.L1Loss(), shave_edge=None):
-        super(TexturalLoss, self).__init__()
+        super(StyleLoss, self).__init__()
         self.criterion = criterion
-        self.features_extractor = MultiVGGFeaturesExtractor(target_features=features_to_compute, requires_grad=False, use_input_norm=True, shave_edge=shave_edge).eval()
+        self.features_extractor = MultiVGGFeaturesExtractor(target_features=features_to_compute, use_input_norm=True, shave_edge=shave_edge).eval()
 
     def forward(self, inputs, targets):
         inputs_fea = self.features_extractor(inputs)

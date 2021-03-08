@@ -56,7 +56,7 @@ class VGGFeaturesExtractor(nn.Module):
         return output
 
 class MultiVGGFeaturesExtractor(nn.Module):
-    def __init__(self, target_features=('relu1_1', 'relu2_1', 'relu3_1'), use_bn=False, use_input_norm=True, requires_grad=True, shave_edge=None):
+    def __init__(self, target_features=('relu1_1', 'relu2_1', 'relu3_1'), use_bn=False, use_input_norm=True, requires_grad=False, shave_edge=None):
         super(MultiVGGFeaturesExtractor, self).__init__()
         self.use_input_norm = use_input_norm
         self.target_features = target_features

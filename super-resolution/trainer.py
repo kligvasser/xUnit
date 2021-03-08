@@ -9,14 +9,12 @@ from data import get_loaders
 from ast import literal_eval
 from utils.recorderx import RecoderX
 from utils.misc import save_image, average, mkdir, compute_psnr
-from models.modules.losses import RangeLoss, PerceptualLoss, TexturalLoss
+from models.modules.losses import RangeLoss, PerceptualLoss, StyleLoss
 
 class Trainer():
     def __init__(self, args):
         # parameters
         self.args = args
-        self.device = args.device
-        self.session = 0
         self.print_model = True
         self.invalidity_margins = None
         
@@ -77,15 +75,15 @@ class Trainer():
             self.reconstruction = torch.nn.L1Loss().to(self.args.device)
         if self.args.perceptual_weight > 0.:
              self.perceptual = PerceptualLoss(features_to_compute=['conv5_4'], criterion=torch.nn.L1Loss(), shave_edge=self.invalidity_margins).to(self.args.device)
-        if self.args.textural_weight > 0.:
-            self.textural = TexturalLoss(features_to_compute=['relu3_1', 'relu2_1']).to(self.args.device)
+        if self.args.style_weight > 0.:
+            self.style = StyleLoss(features_to_compute=['relu3_1', 'relu2_1']).to(self.args.device)
         if self.args.range_weight > 0.:
             self.range = RangeLoss(invalidity_margins=self.invalidity_margins).to(self.args.device)
 
     def _init(self):
         # init parameters
-        self.steps = 0
-        self.losses = {'D': [], 'D_r': [], 'D_gp': [], 'D_f': [], 'G': [], 'G_recon': [], 'G_rng': [], 'G_perc': [], 'G_txt': [], 'G_adv': [], 'psnr': []}
+        self.step = 0
+        self.losses = {'D': [], 'D_r': [], 'D_gp': [], 'D_f': [], 'G': [], 'G_recon': [], 'G_rng': [], 'G_perc': [], 'G_sty': [], 'G_adv': [], 'psnr': []}
 
         # initialize model
         self._init_model()
@@ -188,17 +186,17 @@ class Trainer():
         # calculate interpolation
         alpha = torch.rand(batch_size, 1, 1, 1)
         alpha = alpha.expand_as(real_data)
-        alpha = alpha.to(self.device)
+        alpha = alpha.to(self.args.device)
         interpolated = alpha * real_data.data + (1 - alpha) * generated_data.data
         interpolated = Variable(interpolated, requires_grad=True)
-        interpolated = interpolated.to(self.device)
+        interpolated = interpolated.to(self.args.device)
 
         # calculate probability of interpolated examples
         prob_interpolated = self.d_model(interpolated)
 
         # calculate gradients of probabilities with respect to examples
         gradients = torch_grad(outputs=prob_interpolated, inputs=interpolated,
-                               grad_outputs=torch.ones(prob_interpolated.size()).to(self.device),
+                               grad_outputs=torch.ones(prob_interpolated.size()).to(self.args.device),
                                create_graph=True, retain_graph=True)[0]
 
         # gradients have shape (batch_size, num_channels, img_width, img_height),
@@ -249,11 +247,11 @@ class Trainer():
             loss += loss_perc * self.args.perceptual_weight
             self.losses['G_perc'].append(loss_perc.data.item())
 
-        # textural loss
-        if self.args.textural_weight > 0.:
-            loss_txt = self.textural(generated_data, targets)
-            loss += loss_txt * self.args.textural_weight
-            self.losses['G_txt'].append(loss_txt.data.item())
+        # style loss
+        if self.args.style_weight > 0.:
+            loss_sty = self.style(generated_data, targets)
+            loss += loss_sty * self.args.style_weight
+            self.losses['G_sty'].append(loss_sty.data.item())
 
         # backward loss
         loss.backward()
@@ -264,9 +262,8 @@ class Trainer():
 
     def _train_iteration(self, data):
         # set inputs
-        self.steps += 1
-        inputs = data['input'].to(self.device)
-        targets = data['target'].to(self.device)
+        inputs = data['input'].to(self.args.device)
+        targets = data['target'].to(self.args.device)
 
         # critic iteration
         if self.args.adversarial_weight > 0.:
@@ -276,17 +273,17 @@ class Trainer():
                 self._critic_hinge_iteration(inputs, targets)
 
         # only update generator every |critic_iterations| iterations
-        if self.steps % self.args.num_critic == 0:
+        if self.step % self.args.num_critic == 0:
             self._generator_iteration(inputs, targets)
 
         # logging
-        if self.steps % self.args.print_every == 0:
-            line2print = 'Iteration {}'.format(self.steps + 1)
+        if self.step % self.args.print_every == 0:
+            line2print = 'Iteration {}'.format(self.step)
             if self.args.adversarial_weight > 0.:
                 line2print += ', D: {:.6f}, D_r: {:.6f}, D_f: {:.6f}'.format(self.losses['D'][-1], self.losses['D_r'][-1], self.losses['D_f'][-1])
                 if self.args.penalty_weight > 0.:
                     line2print += ', D_gp: {:.6f}'.format(self.losses['D_gp'][-1])
-            if self.steps > self.args.num_critic:
+            if self.step > self.args.num_critic:
                 line2print += ', G: {:.5f}'.format(self.losses['G'][-1])
                 if self.args.reconstruction_weight:
                     line2print += ', G_recon: {:.6f}'.format(self.losses['G_recon'][-1])
@@ -294,8 +291,8 @@ class Trainer():
                     line2print += ', G_rng: {:.6f}'.format(self.losses['G_rng'][-1])
                 if self.args.perceptual_weight:
                     line2print += ', G_perc: {:.6f}'.format(self.losses['G_perc'][-1])
-                if self.args.textural_weight:
-                    line2print += ', G_txt: {:.8f}'.format(self.losses['G_txt'][-1])
+                if self.args.style_weight:
+                    line2print += ', G_sty: {:.8f}'.format(self.losses['G_sty'][-1])
                 if self.args.adversarial_weight:
                     line2print += ', G_adv: {:.6f},'.format(self.losses['G_adv'][-1])
             logging.info(line2print)
@@ -303,13 +300,13 @@ class Trainer():
         # plots for tensorboard
         if self.args.use_tb:
             if self.args.adversarial_weight > 0.:
-                self.tb.add_scalar('data/loss_d', self.losses['D'][-1], self.steps)
-            if self.steps > self.args.num_critic:
-                self.tb.add_scalar('data/loss_g', self.losses['G'][-1], self.steps)
+                self.tb.add_scalar('data/loss_d', self.losses['D'][-1], self.step)
+            if self.step > self.args.num_critic:
+                self.tb.add_scalar('data/loss_g', self.losses['G'][-1], self.step)
 
     def _eval_iteration(self, data, epoch):
         # set inputs
-        inputs = data['input'].to(self.device)
+        inputs = data['input'].to(self.args.device)
         targets = data['target']
         paths = data['path']
 
@@ -330,6 +327,7 @@ class Trainer():
         # train over epochs
         for _, data in enumerate(loader):
             self._train_iteration(data)
+            self.step += 1
 
     def _eval_epoch(self, loader, epoch):
         self.g_model.eval()
