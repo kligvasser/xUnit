@@ -53,7 +53,7 @@ This code requires PyTorch 1.0+ and python 3+.
 Pretrained models are avaible at: [LINK](https://www.dropbox.com/s/hq1n5yrl5hjsh34/sr_pretrained.zip?dl=0).
 
 <p align="center">
-  <img width="871" height="676" src="/figures/tradeoff.png">
+  <img width="435" height="338" src="/figures/tradeoff.png">
 </p>
 
 #### Dataset preparation
