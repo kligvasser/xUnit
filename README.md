@@ -50,7 +50,11 @@ python -m pip install -r requirements.txt
 This code requires PyTorch 1.0+ and python 3+.
 
 ### Super-resoltution
-Pretrained models are avaible at: [LINK](https://www.dropbox.com/s/wvc0qsuoekfuhfz/sr_pretrained.zip?dl=0).
+Pretrained models are avaible at: [LINK](https://www.dropbox.com/s/hq1n5yrl5hjsh34/sr_pretrained.zip?dl=0).
+
+<p align="center">
+  <img width="871" height="676" src="/figures/tradeoff.png">
+</p>
 
 #### Dataset preparation
 For the super-resolution task, the dataset should contains a low and high resolution pairs, in folder structure of:
